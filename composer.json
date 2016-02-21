@@ -1,0 +1,17 @@
+{
+  "name": "yanivgal/megdb",
+  "description": "DB Abstraction Layer",
+  "keywords": ["PHP","DB","database", "abstraction", "layer"],
+  "homepage": "http://github.com/yanivgal/MegDB",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Yaniv Gal"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "yanivgal\\": "src"
+    }
+  }
+}
