@@ -2,8 +2,26 @@
 
 namespace yanivgal;
 
+use PDO;
+use PDOStatement;
+
 class MegDB
 {
+    /**
+     * @var string
+     */
+    private $driver;
+
+    /**
+     * @var string
+     */
+    private $host;
+
+    /**
+     * @var string
+     */
+    private $dbName;
+
     /**
      * @var string
      */
@@ -25,24 +43,35 @@ class MegDB
     private $options;
 
     /**
-     * @var \PDO
+     * @var PDO
      */
     private $pdo;
 
     /**
-     * @var \PDOStatement
+     * @var PDOStatement
      */
     private $statement;
 
+    /**
+     * MegDB constructor.
+     * @param string $driver
+     * @param string $host
+     * @param string $dbName
+     * @param string $username
+     * @param string $password
+     */
     public function __construct($driver, $host, $dbName, $username, $password)
     {
+        $this->driver = $driver;
+        $this->host = $host;
+        $this->dbName = $dbName;
         $this->dns = $driver . ':host=' . $host . ';dbname=' . $dbName;
         $this->username = $username;
         $this->password = $password;
 
         $this->options = [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_TIMEOUT => 30
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_TIMEOUT => 30
         ];
     }
 
@@ -281,7 +310,7 @@ class MegDB
      */
     public function fetchAllName()
     {
-        return $this->statement->fetchAll(\PDO::FETCH_ASSOC);
+        return $this->statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -289,7 +318,7 @@ class MegDB
      */
     public function fetchAllNum()
     {
-        return $this->statement->fetchAll(\PDO::FETCH_NUM);
+        return $this->statement->fetchAll(PDO::FETCH_NUM);
     }
 
     /**
@@ -297,7 +326,7 @@ class MegDB
      */
     public function fetchNum()
     {
-        return $this->statement->fetch(\PDO::FETCH_NUM);
+        return $this->statement->fetch(PDO::FETCH_NUM);
     }
 
     /**
@@ -332,7 +361,7 @@ class MegDB
      */
     public function fetchAllValue()
     {
-        return $this->statement->fetchAll(\PDO::FETCH_COLUMN);
+        return $this->statement->fetchAll(PDO::FETCH_COLUMN);
     }
 
     /**
@@ -359,7 +388,7 @@ class MegDB
     /**
      * Connect to database
      *
-     * @return \PDO
+     * @return PDO
      */
     private function connect()
     {
@@ -368,7 +397,7 @@ class MegDB
             return $this->pdo;
         }
 
-        $this->pdo = new \PDO(
+        $this->pdo = new PDO(
             $this->dns,
             $this->username,
             $this->password,
@@ -389,6 +418,22 @@ class MegDB
     public function disconnect()
     {
         $this->pdo = null;
+    }
+
+    public function createDb()
+    {
+        $dns = $this->driver . ':host=' . $this->host;
+        $dbh = new PDO($dns, $this->username, $this->password);
+        $dbh->exec('CREATE DATABASE IF NOT EXISTS ' . $this->dbName)
+        or die(print_r($dbh->errorInfo(), true));
+    }
+
+    public function dropDb()
+    {
+        $dns = $this->driver . ':host=' . $this->host;
+        $dbh = new PDO($dns, $this->username, $this->password);
+        $dbh->exec('DROP DATABASE IF EXISTS ' . $this->dbName)
+        or die(print_r($dbh->errorInfo(), true));
     }
 
     /**
